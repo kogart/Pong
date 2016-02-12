@@ -43,7 +43,7 @@ public class Main extends Application
         Image sun   = new Image("sample/images/space.jpg");
         Image space = new Image("sample/images/space.jpg");
 
-        Timeline gameLoop = new Timeline();
+        Timeline gameLoop = new Timeline(); // Add comment!!!
         gameLoop.setCycleCount( Timeline.INDEFINITE );
 
         final long timeStart = System.currentTimeMillis();
