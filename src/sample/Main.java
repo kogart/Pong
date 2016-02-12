@@ -34,14 +34,14 @@ public class Main extends Application
         Scene theScene = new Scene( root );
         theStage.setScene( theScene );
 
-        Canvas canvas = new Canvas( 600, 375 );
+        Canvas canvas = new Canvas( 960, 720 );
         root.getChildren().add( canvas );
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        Image earth = new Image("sample/images/space.jpg");
-        Image sun   = new Image("sample/images/space.jpg");
-        Image space = new Image("sample/images/space.jpg");
+        Image earth = new Image("sample/images/ball.png");
+        Image sun   = new Image("sample/images/pad.jpg");
+        Image space = new Image("sample/images/soccerField.jpg");
 
         Timeline gameLoop = new Timeline();
         gameLoop.setCycleCount( Timeline.INDEFINITE );
