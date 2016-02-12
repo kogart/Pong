@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.Group;
@@ -14,10 +15,8 @@ import javafx.util.Duration;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 
-// An alternative implementation of Example 3,
-//    using the Timeline, KeyFrame, and Duration classes.
+import java.util.ArrayList;
 
-// Animation of Earth rotating around the sun. (Hello, world!)
 public class Main extends Application
 {
     public static void main(String[] args)
@@ -28,7 +27,7 @@ public class Main extends Application
     @Override
     public void start(Stage theStage)
     {
-        theStage.setTitle( "Timeline Example" );
+        theStage.setTitle( "PONG" );
 
         Group root = new Group();
         Scene theScene = new Scene( root );
@@ -38,10 +37,34 @@ public class Main extends Application
         Canvas canvas = new Canvas( 960, 720 );
         root.getChildren().add( canvas );
 
+        ArrayList<String> input = new ArrayList<String>();
+
+        theScene.setOnKeyPressed(
+                new EventHandler<KeyEvent>()
+                {
+                    public void handle(KeyEvent e)
+                    {
+                        String code = e.getCode().toString();
+
+                        // only add once... prevent duplicates
+                        if ( !input.contains(code) )
+                            input.add( code );
+                    }
+                });
+
+        theScene.setOnKeyReleased(
+                new EventHandler<KeyEvent>()
+                {
+                    public void handle(KeyEvent e)
+                    {
+                        String code = e.getCode().toString();
+                        input.remove( code );
+                    }
+                });
+
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         Image earth = new Image("sample/images/ball.png");
-        Image sun   = new Image("sample/images/pad.jpg");
         Image space = new Image("sample/images/soccerField.jpg");
 
         Timeline gameLoop = new Timeline();
@@ -49,10 +72,19 @@ public class Main extends Application
 
         final long timeStart = System.currentTimeMillis();
 
+        // Create player pad
+        Pad player = new Pad(20);
+
+        // Create opponent pad
+        Pad opponent = new Pad(870);
+
         KeyFrame kf = new KeyFrame(
-                Duration.seconds(0.017),                // 60 FPS
+                Duration.seconds(0.017),        //         60 FPS
                 new EventHandler<ActionEvent>()
                 {
+
+                    double padPosY = 300;
+
                     public void handle(ActionEvent ae)
                     {
                         double t = (System.currentTimeMillis() - timeStart) / 1000.0;
@@ -60,13 +92,22 @@ public class Main extends Application
                         double x = 232 + 128 * Math.cos(t);
                         double y = 232 + 128 * Math.sin(t);
 
+                        if(input.contains("UP")) {
+                            player.moveUp();
+                        }
+
+                        if(input.contains("DOWN")) {
+                            player.moveDown();
+                        }
+
                         // Clear the canvas
                         gc.clearRect(0, 0, 512,512);
 
                         // background image clears canvas
                         gc.drawImage( space, 0, 0 );
                         gc.drawImage( earth, x, y );
-                        gc.drawImage( sun, 50, 320 );
+                        gc.drawImage( player.getImage(), player.getStartX(), player.getCurrentPos());
+                        gc.drawImage( opponent.getImage(), opponent.getStartX(), opponent.getCurrentPos());
                     }
                 });
 
