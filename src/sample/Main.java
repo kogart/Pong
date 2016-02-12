@@ -34,7 +34,7 @@ public class Main extends Application
         Scene theScene = new Scene( root );
         theStage.setScene( theScene );
 
-        Canvas canvas = new Canvas( 600, 375 );
+        Canvas canvas = new Canvas( 1280, 720 );
         root.getChildren().add( canvas );
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -65,7 +65,7 @@ public class Main extends Application
                         // background image clears canvas
                         gc.drawImage( space, 0, 0 );
                         gc.drawImage( earth, x, y );
-                        gc.drawImage( sun, 196, 196 );
+                        gc.drawImage( sun, 50, 320 );
                     }
                 });
 
