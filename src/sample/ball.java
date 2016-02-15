@@ -5,31 +5,40 @@ import javafx.scene.image.ImageView;
 public class Ball {
 
     Image image = new Image("sample/images/pad.jpg");
-    private ImageView ball = new ImageView();
-    private int startX;
-    private int startY;
-    private int currentX;
-    private int currentY;
-    private int ballSpeed;
+    private double currentX;
+    private double currentY;
+    private double ballSpeedY = 5;
+    private double ballSpeedX = 5;
+    final double BallMinX = 0;
+    final double BallMaxX = 900;
+    final double BallMinY = 0;
+    final double BallMaxY = 520;
 
     public Ball(int startX, int startY){
-        this.startX = startX;
-        this.startY = startY;
-        ball.setImage(image);
-        ball.setFitWidth(100);
-        ball.setFitHeight(100);
-        ball.setPreserveRatio(true);
+        this.currentX = startX;
+        this.currentY = startY;
     }
     public Image getBall(){return this.image;}
 
-    public int getStartX(){return this.startX;}
+    public double getCurrentX(){return this.currentX;}
 
-    public int getStartY(){return this.startY;}
+    public double getCurrentY(){return this.currentY;}
 
-    public int getCurrentX(){return this.currentX;}
 
-    public int getCurrentY(){return this.currentY;}
-
-    public void ballMove(){this.currentX += 1;this.currentY += 1;}
-
+    public void ballMove() {
+        if (this.currentY == BallMinY) {
+            this.ballSpeedY = 5;
+        }
+        else if (this.currentY == BallMaxY) {
+            this.ballSpeedY = -5;
+        }
+        if (this.currentX == BallMinX) {
+            this.ballSpeedX = 5;
+        }
+        else if (this.currentX == BallMaxX) {
+            this.ballSpeedX = -5;
+        }
+        this.currentY += this.ballSpeedY;
+        this.currentX += this.ballSpeedX;
+    }
 }
