@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -64,8 +65,8 @@ public class Main extends Application
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        Image earth = new Image("sample/images/ball.png");
         Image space = new Image("sample/images/soccerField.jpg");
+
 
         Timeline gameLoop = new Timeline();
         gameLoop.setCycleCount( Timeline.INDEFINITE );
@@ -78,6 +79,9 @@ public class Main extends Application
         // Create opponent pad
         Pad opponent = new Pad(870);
 
+        // Create Ball
+        Ball ball = new Ball(500, 100);
+
         KeyFrame kf = new KeyFrame(
                 Duration.seconds(0.017),        //         60 FPS
                 new EventHandler<ActionEvent>()
@@ -89,9 +93,6 @@ public class Main extends Application
                     {
                         double t = (System.currentTimeMillis() - timeStart) / 1000.0;
 
-                        double x = 232 + 128 * Math.cos(t);
-                        double y = 232 + 128 * Math.sin(t);
-
                         if(input.contains("UP")) {
                             player.moveUp();
                         }
@@ -100,14 +101,18 @@ public class Main extends Application
                             player.moveDown();
                         }
 
+                        ball.ballMove();
+
+
+
                         // Clear the canvas
                         gc.clearRect(0, 0, 512,512);
 
                         // background image clears canvas
                         gc.drawImage( space, 0, 0 );
-                        gc.drawImage( earth, x, y );
                         gc.drawImage( player.getImage(), player.getStartX(), player.getCurrentPos());
                         gc.drawImage( opponent.getImage(), opponent.getStartX(), opponent.getCurrentPos());
+                        gc.drawImage( ball.getBall(), ball.getCurrentX(),ball.getCurrentY());
                     }
                 });
 
