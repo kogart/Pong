@@ -4,7 +4,7 @@ import javafx.scene.image.ImageView;
 
 public class Ball {
 
-    Image image = new Image("sample/images/pad.jpg");
+    Image image = new Image("sample/images/ball.png");
     private int playerScore = 0;
     private double currentX;
     private double currentY;
@@ -28,7 +28,6 @@ public class Ball {
     public double getCurrentY(){return this.currentY;}
 
     public double getPlayerScore(){return this.playerScore;}
-
 
     public void ballMove() {
         if (this.currentY == BallMinY) {

@@ -2,7 +2,7 @@ package sample;
 import javafx.scene.image.Image;
 
 public class Pad {
-    Image padImage = new Image("sample/images/pad.jpg");
+    Image padImage = new Image("sample/images/padPlayer1.png");
     final double PAD_MIN_Y = 0;
     final double PAD_MAX_Y = 520;
     final double PAD_SPEED = 7;

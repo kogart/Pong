@@ -1,7 +1,6 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -9,19 +8,45 @@ import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.util.Duration;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 
-import java.util.ArrayList;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 public class Main extends Application
 {
-    public static void main(String[] args)
-    {
+    public static void main(String[] args)throws IOException {
+      if (args.length != 1){
+            System.out.println("Usage: java Client <hostname>");
+            return;
+        }
+
+
+            DatagramSocket socket = new DatagramSocket();
+
+
+
+        //send request
+        byte[] buff = new byte[256];
+        InetAddress address = InetAddress.getByName(args[0]);
+        DatagramPacket packet = new DatagramPacket(buff, buff.length, address, 4455);
+        socket.send(packet);
+
+        //get response
+        packet = new DatagramPacket(buff, buff.length);
+        socket.receive(packet);
+
+        //display response
+        String recived = new String(packet.getData(), 0, packet.getLength());
+        System.out.println("data recived: " + recived);
+
+        socket.close();
+
         launch(args);
     }
 
@@ -35,7 +60,7 @@ public class Main extends Application
         theStage.setScene( theScene );
 
 
-        Canvas canvas = new Canvas( 960, 720 );
+        Canvas canvas = new Canvas( 1280, 720 );
         root.getChildren().add( canvas );
 
         ArrayList<String> input = new ArrayList<String>();
@@ -65,7 +90,7 @@ public class Main extends Application
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        Image space = new Image("sample/images/soccerField.jpg");
+        Image space = new Image("sample/images/bg.png");
 
 
         Timeline gameLoop = new Timeline();
@@ -86,7 +111,6 @@ public class Main extends Application
                 Duration.seconds(0.017),        //         60 FPS
                 new EventHandler<ActionEvent>()
                 {
-
                     double padPosY = 300;
 
                     public void handle(ActionEvent ae)
@@ -100,6 +124,8 @@ public class Main extends Application
                         if(input.contains("DOWN")) {
                             player.moveDown();
                         }
+
+                        if(ball.getCurrentY() == player.getCurrentPos())
 
                         ball.ballMove();
 
