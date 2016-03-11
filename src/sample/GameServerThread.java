@@ -40,24 +40,32 @@ public class GameServerThread extends Thread {
     }
         public void run() {
 
-            ball = new Ball(640,360);
+            ball = new Ball(603,323);
+
+
             while (moreData) {
                 try{
                     byte[] buff = new byte[8];
 
-                    //recive request
+                    //receive request
                     DatagramPacket packet = new DatagramPacket(buff, buff.length);
                     socket.receive(packet);
                     Boolean gameOn = false;
-                    String recived = new String(packet.getData(), 0, packet.getLength());
-                    if(recived.equals("0")) gameOn = false;
-                    else if(recived.equals("1")) gameOn = true;
+                    String received = new String(packet.getData(), 0, packet.getLength());
+                    if(received.equals("0")) gameOn = false;
+                    else if(received.equals("1")) gameOn = true;
                     if(gameOn) {
+
                         //figure out response
-                        ball.ballMove();
+                        try {
+                            ball.ballMove();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
                         String ballPos = ball.getCurrentX() + " " + ball.getCurrentY();
                         buff = ballPos.getBytes();
-                        System.out.println(ballPos);
+
                         //send response to the client at ip and port
                         InetAddress address = packet.getAddress();
                         int port = packet.getPort();
@@ -84,6 +92,5 @@ public class GameServerThread extends Thread {
         }
         return returnValue;
     }
-
 
 }

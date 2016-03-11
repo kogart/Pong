@@ -2,15 +2,21 @@ package sample;
 import javafx.scene.image.Image;
 
 public class Pad {
-    Image padImage = new Image("sample/images/padPlayer1.png");
+    Image padImage;
     final double PAD_MIN_Y = 0;
     final double PAD_MAX_Y = 520;
     final double PAD_SPEED = 7;
     double currentPos = 300;
     double startX;
 
-    public Pad(double startX){
+    public Pad(double startX, boolean playerOne){
         this.startX = startX;
+        if (playerOne) {
+            padImage = new Image("sample/images/padPlayer1.png");
+        } else if (!playerOne) {
+            padImage = new Image("sample/images/padPlayer2-can.png");
+        }
+
     }
 
     public Image getImage(){

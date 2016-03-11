@@ -1,6 +1,4 @@
 package sample;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 public class Ball {
 
@@ -12,10 +10,10 @@ public class Ball {
     private int startX;
     private double ballSpeedY = 5;
     private double ballSpeedX = 5;
-    final double BallMinX = 0;
+    final double BallMinX = -75;
     final double BallMaxX = 1280;
     final double BallMinY = 0;
-    final double BallMaxY = 720;
+    final double BallMaxY = 650;
 
     public Ball(int startX, int startY){
         this.startX = startX;
@@ -29,24 +27,28 @@ public class Ball {
 
     public double getPlayerScore(){return this.playerScore;}
 
-    public void ballMove() {
-        if (this.currentY == BallMinY) {
-            this.ballSpeedY = 1;
+    public void ballMove() throws InterruptedException {
+        if (this.currentY <= BallMinY) {
+            this.ballSpeedY = 6;
         }
-        else if (this.currentY == BallMaxY) {
-            this.ballSpeedY = -1;
+
+        else if (this.currentY >= BallMaxY) {
+            this.ballSpeedY = -6;
         }
-        if (this.currentX == BallMinX) {
+
+        if (this.currentX <= BallMinX) {
             this.currentY = this.startY;
             this.currentX = this.startX;
-            this.ballSpeedX = 1;
+            this.ballSpeedX = 6;
         }
-        else if (this.currentX == BallMaxX) {
+
+        else if (this.currentX >= BallMaxX) {
             this.playerScore++;
             this.currentY = this.startY;
             this.currentX = this.startX;
-            this.ballSpeedX = -1;
+            this.ballSpeedX = -6;
         }
+
         this.currentY += this.ballSpeedY;
         this.currentX += this.ballSpeedX;
     }

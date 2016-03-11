@@ -24,14 +24,15 @@ public class Main extends Application
     Integer ballPosY;
     static String adress;
     static String received = "";
-    Image image = new Image("sample/images/ball.png");
+    static Pad player1;
+    static Pad player2;
+    Image image = new Image("sample/images/ball-cap.png");
     public static void main(String[] args)throws IOException {
         adress = args[0];
       if (args.length != 1){
             System.out.println("Usage: java Client <hostname>");
             return;
         }
-
 
         launch(args);
     }
@@ -91,10 +92,10 @@ public class Main extends Application
         final long timeStart = System.currentTimeMillis();
 
         // Create player pad
-        Pad player = new Pad(20);
+        player1 = new Pad(20, true);
 
         // Create opponent pad
-        Pad opponent = new Pad(870);
+        player2 = new Pad(1180, false);
 
         // Create Ball
         Ball ball = new Ball(500, 100);
@@ -102,8 +103,8 @@ public class Main extends Application
         DatagramSocket socket = new DatagramSocket();
 
         KeyFrame kf = new KeyFrame(
-                Duration.seconds(0.017),        //         60 FPS
-               // Duration.seconds(0.007),        //         60 FPS
+                Duration.seconds(0.034),        //         30 FPS
+               // Duration.seconds(0.017),        //         60 FPS
                 new EventHandler<ActionEvent>()
                 {
                     double padPosY = 300;
@@ -112,9 +113,6 @@ public class Main extends Application
                     {
 
                         try {
-
-
-
 
                                 //send request
                                 byte[] buff = "1".getBytes();
@@ -135,9 +133,6 @@ public class Main extends Application
                                 ballPosY = Integer.valueOf(ballpos[1]);
 
 
-
-
-
                         }catch (IOException e)
                         {
                             e.printStackTrace();
@@ -146,24 +141,24 @@ public class Main extends Application
                         double t = (System.currentTimeMillis() - timeStart) / 1000.0;
 
                         if(input.contains("UP")) {
-                            player.moveUp();
+                            player1.moveUp();
+                            player2.moveUp();
                         }
 
                         if(input.contains("DOWN")) {
-                            player.moveDown();
+                            player1.moveDown();
+                            player2.moveDown();
                         }
 
-                        if(ball.getCurrentY() == player.getCurrentPos())
-
-
+                        if(ball.getCurrentY() == player1.getCurrentPos())
 
                         // Clear the canvas
                         gc.clearRect(0, 0, 512,512);
 
                         // background image clears canvas
                         gc.drawImage( space, 0, 0 );
-                        gc.drawImage( player.getImage(), player.getStartX(), player.getCurrentPos());
-                        gc.drawImage( opponent.getImage(), opponent.getStartX(), opponent.getCurrentPos());
+                        gc.drawImage( player1.getImage(), player1.getStartX(), player1.getCurrentPos());
+                        gc.drawImage( player2.getImage(), player2.getStartX(), player2.getCurrentPos());
                         gc.drawImage( image , ballPosX , ballPosY );
                     }
                 });
