@@ -20,39 +20,24 @@ import java.util.*;
 
 public class Main extends Application
 {
+    Integer ballPosX;
+    Integer ballPosY;
+    static String adress;
+    static String received = "";
+    Image image = new Image("sample/images/ball.png");
     public static void main(String[] args)throws IOException {
+        adress = args[0];
       if (args.length != 1){
             System.out.println("Usage: java Client <hostname>");
             return;
         }
 
 
-            DatagramSocket socket = new DatagramSocket();
-
-
-
-        //send request
-        byte[] buff = new byte[256];
-        InetAddress address = InetAddress.getByName(args[0]);
-        DatagramPacket packet = new DatagramPacket(buff, buff.length, address, 4455);
-        socket.send(packet);
-
-        //get response
-        packet = new DatagramPacket(buff, buff.length);
-        socket.receive(packet);
-
-        //display response
-        String recived = new String(packet.getData(), 0, packet.getLength());
-        System.out.println("data recived: " + recived);
-
-        socket.close();
-
         launch(args);
     }
 
     @Override
-    public void start(Stage theStage)
-    {
+    public void start(Stage theStage) throws SocketException {
         theStage.setTitle( "PONG" );
 
         Group root = new Group();
@@ -88,6 +73,13 @@ public class Main extends Application
                     }
                 });
 
+
+
+
+
+
+
+
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         Image space = new Image("sample/images/bg.png");
@@ -107,14 +99,50 @@ public class Main extends Application
         // Create Ball
         Ball ball = new Ball(500, 100);
 
+        DatagramSocket socket = new DatagramSocket();
+
         KeyFrame kf = new KeyFrame(
                 Duration.seconds(0.017),        //         60 FPS
+               // Duration.seconds(0.007),        //         60 FPS
                 new EventHandler<ActionEvent>()
                 {
                     double padPosY = 300;
 
                     public void handle(ActionEvent ae)
                     {
+
+                        try {
+
+
+
+
+                                //send request
+                                byte[] buff = "1".getBytes();
+                                InetAddress address = InetAddress.getByName(adress);
+                                DatagramPacket packet = new DatagramPacket(buff, buff.length, address, 7537);
+                                socket.send(packet);
+
+                                //get response
+                                buff = new byte[8];
+                                packet = new DatagramPacket(buff, buff.length);
+                                socket.receive(packet);
+
+                                //display response
+                                received = new String(packet.getData(),0,packet.getLength());
+                                String[] ballpos = received.split(" ");
+
+                                ballPosX = Integer.valueOf(ballpos[0]);
+                                ballPosY = Integer.valueOf(ballpos[1]);
+
+
+
+
+
+                        }catch (IOException e)
+                        {
+                            e.printStackTrace();
+                        }
+
                         double t = (System.currentTimeMillis() - timeStart) / 1000.0;
 
                         if(input.contains("UP")) {
@@ -127,8 +155,6 @@ public class Main extends Application
 
                         if(ball.getCurrentY() == player.getCurrentPos())
 
-                        ball.ballMove();
-
 
 
                         // Clear the canvas
@@ -138,10 +164,10 @@ public class Main extends Application
                         gc.drawImage( space, 0, 0 );
                         gc.drawImage( player.getImage(), player.getStartX(), player.getCurrentPos());
                         gc.drawImage( opponent.getImage(), opponent.getStartX(), opponent.getCurrentPos());
-                        gc.drawImage( ball.getBall(), ball.getCurrentX(),ball.getCurrentY());
+                        gc.drawImage( image , ballPosX , ballPosY );
                     }
                 });
-
+            received = "";
         gameLoop.getKeyFrames().add( kf );
         gameLoop.play();
 
