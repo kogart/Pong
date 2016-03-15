@@ -26,7 +26,9 @@ public class Main extends Application
     static String received = "";
     static Pad player1;
     static Pad player2;
-    Image image = new Image("sample/images/ball-cap.png");
+    Image ball = new Image("sample/images/ball-cap.png");
+    Image pad1 = new Image("sample/images/padPlayer1.png");
+    Image pad2 = new Image("sample/images/padPlayer2-can.png");
     public static void main(String[] args)throws IOException {
         adress = args[0];
       if (args.length != 1){
@@ -92,19 +94,18 @@ public class Main extends Application
         final long timeStart = System.currentTimeMillis();
 
         // Create player pad
-        player1 = new Pad(20, true);
+        player1 = new Pad(20);
 
         // Create opponent pad
-        player2 = new Pad(1180, false);
+        player2 = new Pad(1180);
 
-        // Create Ball
-        Ball ball = new Ball(500, 100);
+
 
         DatagramSocket socket = new DatagramSocket();
 
         KeyFrame kf = new KeyFrame(
                 Duration.seconds(0.034),        //         30 FPS
-               // Duration.seconds(0.017),        //         60 FPS
+                //Duration.seconds(0.017),        //         60 FPS
                 new EventHandler<ActionEvent>()
                 {
                     double padPosY = 300;
@@ -115,7 +116,7 @@ public class Main extends Application
                         try {
 
                                 //send request
-                                byte[] buff = "1".getBytes();
+                                byte[] buff = Integer.toString(player1.getCurrentPos()).getBytes();
                                 InetAddress address = InetAddress.getByName(adress);
                                 DatagramPacket packet = new DatagramPacket(buff, buff.length, address, 7537);
                                 socket.send(packet);
@@ -138,7 +139,7 @@ public class Main extends Application
                             e.printStackTrace();
                         }
 
-                        double t = (System.currentTimeMillis() - timeStart) / 1000.0;
+                        //double t = (System.currentTimeMillis() - timeStart) / 1000.0;
 
                         if(input.contains("UP")) {
                             player1.moveUp();
@@ -150,16 +151,14 @@ public class Main extends Application
                             player2.moveDown();
                         }
 
-                        if(ball.getCurrentY() == player1.getCurrentPos())
-
                         // Clear the canvas
                         gc.clearRect(0, 0, 512,512);
 
                         // background image clears canvas
                         gc.drawImage( space, 0, 0 );
-                        gc.drawImage( player1.getImage(), player1.getStartX(), player1.getCurrentPos());
-                        gc.drawImage( player2.getImage(), player2.getStartX(), player2.getCurrentPos());
-                        gc.drawImage( image , ballPosX , ballPosY );
+                        gc.drawImage( pad1, player1.getStartX(), player1.getCurrentPos());
+                        gc.drawImage( pad2, player2.getStartX(), player2.getCurrentPos());
+                        gc.drawImage( ball , ballPosX , ballPosY );
                     }
                 });
             received = "";

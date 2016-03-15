@@ -3,19 +3,14 @@ import javafx.scene.image.Image;
 
 public class Pad {
     Image padImage;
-    final double PAD_MIN_Y = 0;
-    final double PAD_MAX_Y = 520;
-    final double PAD_SPEED = 7;
-    double currentPos = 300;
-    double startX;
+    final int PAD_MIN_Y = 0;
+    final int PAD_MAX_Y = 520;
+    final int PAD_SPEED = 7;
+    int currentPos = 300;
+    int startX;
 
-    public Pad(double startX, boolean playerOne){
+    public Pad(int startX){
         this.startX = startX;
-        if (playerOne) {
-            padImage = new Image("sample/images/padPlayer1.png");
-        } else if (!playerOne) {
-            padImage = new Image("sample/images/padPlayer2-can.png");
-        }
 
     }
 
@@ -23,12 +18,16 @@ public class Pad {
         return this.padImage;
     }
 
-    public double getStartX(){
+    public int getStartX(){
         return this.startX;
     }
 
-    public double getCurrentPos(){
+    public int getCurrentPos(){
         return this.currentPos;
+    }
+
+    public void setCurrentPos(int y){
+        this.currentPos = y;
     }
 
     public void moveUp(){

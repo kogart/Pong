@@ -3,81 +3,84 @@ package sample;
 
 import java.io.*;
 import java.net.*;
-import javafx.scene.image.Image;
-import java.util.*;
-import java.util.function.BooleanSupplier;
+
 
 public class GameServerThread extends Thread {
 
-    protected DatagramSocket socket = null;
+    protected DatagramSocket socket;
     protected BufferedReader in = null;
     protected boolean moreData = true;
-    private File f = new File("indata.txt");
-    Ball ball;
-
+    static Ball ball;
+    static Pad pad1;
+    static Pad pad2;
 
     public GameServerThread()throws IOException {
-        this("GameServerThread");
-    }
-
-    public GameServerThread(String name)throws IOException {
-        super(name);
-
-        if(!f.exists())
-            try {
-                f.createNewFile();
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-
         socket = new DatagramSocket(7537);
-        try {
-            in = new BufferedReader(new FileReader(f.getAbsolutePath()));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            System.err.println("Could not open data file.");
-        }
+        socket.setBroadcast(true);
     }
+
         public void run() {
 
-            ball = new Ball(603,323);
+            ball = new Ball(603, 323);
+            pad1 = new Pad(20);
+            pad2 = new Pad(1180);
+            InetAddress adress1 = null;
+            InetAddress adress2 = null;
+            int port1 = 0;
+            int port2 = 0;
+            while (true) {
 
-
-            while (moreData) {
-                try{
+                try {
                     byte[] buff = new byte[8];
-
                     //receive request
-                    DatagramPacket packet = new DatagramPacket(buff, buff.length);
-                    socket.receive(packet);
-                    Boolean gameOn = false;
-                    String received = new String(packet.getData(), 0, packet.getLength());
-                    if(received.equals("0")) gameOn = false;
-                    else if(received.equals("1")) gameOn = true;
-                    if(gameOn) {
+                    DatagramPacket player = new DatagramPacket(buff, buff.length);
+                    socket.receive(player);
+
+                    if(adress1 == null || adress2 == null) {
+                        if (adress1 == null) {
+                            adress1 = player.getAddress();
+                        } else if (adress1 != player.getAddress()) {
+                            adress2 = player.getAddress();
+                        }
+                    }
+                    if(port1 == 0 || port2 == 0) {
+                        if (port1 == 0) {
+                            port1 = player.getPort();
+                        } else if (port1 != player.getPort()) {
+                            port2 = player.getPort();
+                        }
+                    }
+
+
+                    String received = new String(player.getData(), 0, player.getLength());
+                    int pad1Pos = Integer.valueOf(received);
+                    pad1.setCurrentPos(pad1Pos);
+
+                    if (adress1 != null && adress2 != null) {
 
                         //figure out response
-                        try {
-                            ball.ballMove();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        ball.ballMove();
 
                         String ballPos = ball.getCurrentX() + " " + ball.getCurrentY();
                         buff = ballPos.getBytes();
 
                         //send response to the client at ip and port
-                        InetAddress address = packet.getAddress();
-                        int port = packet.getPort();
-                        packet = new DatagramPacket(buff, buff.length, address, port);
-                        socket.send(packet);
+                        player = new DatagramPacket(buff, buff.length, adress1 , port1);
+                        socket.send(player);
+                        player.setAddress(adress2);
+                        player.setPort(port2);
+                        socket.send(player);
+
+
                     }
-                }catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
-                    moreData=true;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            } socket.close();
-        }
+            }
+                //socket.close();
+            }
 
 
     protected String getNextData() {
@@ -92,5 +95,4 @@ public class GameServerThread extends Thread {
         }
         return returnValue;
     }
-
 }

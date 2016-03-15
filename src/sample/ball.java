@@ -25,8 +25,6 @@ public class Ball {
 
     public int getCurrentY(){return this.currentY;}
 
-    public double getPlayerScore(){return this.playerScore;}
-
     public void ballMove() throws InterruptedException {
         if (this.currentY <= BallMinY) {
             this.ballSpeedY = 6;
@@ -43,7 +41,6 @@ public class Ball {
         }
 
         else if (this.currentX >= BallMaxX) {
-            this.playerScore++;
             this.currentY = this.startY;
             this.currentX = this.startX;
             this.ballSpeedX = -6;
