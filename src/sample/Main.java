@@ -29,6 +29,12 @@ public class Main extends Application
     Image ball = new Image("sample/images/ball-cap.png");
     Image pad1 = new Image("sample/images/padPlayer1.png");
     Image pad2 = new Image("sample/images/padPlayer2-can.png");
+    static String recData[];
+    static DatagramSocket socket = null;
+    static double pad1pos;
+
+
+
     public static void main(String[] args)throws IOException {
         adress = args[0];
       if (args.length != 1){
@@ -99,9 +105,7 @@ public class Main extends Application
         // Create opponent pad
         player2 = new Pad(1180);
 
-
-
-        DatagramSocket socket = new DatagramSocket();
+        socket = new DatagramSocket(0000);
 
         KeyFrame kf = new KeyFrame(
                 Duration.seconds(0.034),        //         30 FPS
@@ -122,16 +126,16 @@ public class Main extends Application
                                 socket.send(packet);
 
                                 //get response
-                                buff = new byte[8];
+                                buff = new byte[12];
                                 packet = new DatagramPacket(buff, buff.length);
                                 socket.receive(packet);
 
                                 //display response
                                 received = new String(packet.getData(),0,packet.getLength());
-                                String[] ballpos = received.split(" ");
-
-                                ballPosX = Integer.valueOf(ballpos[0]);
-                                ballPosY = Integer.valueOf(ballpos[1]);
+                                recData = received.split(",");
+                                pad1pos = Double.parseDouble(recData[0]);
+                                ballPosX = Integer.valueOf(recData[1]);
+                                ballPosY = Integer.valueOf(recData[2]);
 
 
                         }catch (IOException e)
@@ -156,8 +160,8 @@ public class Main extends Application
 
                         // background image clears canvas
                         gc.drawImage( space, 0, 0 );
-                        gc.drawImage( pad1, player1.getStartX(), player1.getCurrentPos());
-                        gc.drawImage( pad2, player2.getStartX(), player2.getCurrentPos());
+                        gc.drawImage( pad1, 20, pad1pos );
+                        //gc.drawImage( pad2, player2.getStartX(), player2.getCurrentPos());
                         gc.drawImage( ball , ballPosX , ballPosY );
                     }
                 });

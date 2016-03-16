@@ -1,6 +1,7 @@
 package sample;
 
 
+
 import java.io.*;
 import java.net.*;
 
@@ -15,11 +16,11 @@ public class GameServerThread extends Thread {
     static Pad pad2;
 
     public GameServerThread()throws IOException {
-        socket = new DatagramSocket(7537);
-        socket.setBroadcast(true);
+            socket = new DatagramSocket(7537);
     }
 
         public void run() {
+
 
             ball = new Ball(603, 323);
             pad1 = new Pad(20);
@@ -29,21 +30,21 @@ public class GameServerThread extends Thread {
             int port1 = 0;
             int port2 = 0;
             while (true) {
-
+                
                 try {
-                    byte[] buff = new byte[8];
+                    byte[] buff = new byte[12];
                     //receive request
                     DatagramPacket player = new DatagramPacket(buff, buff.length);
                     socket.receive(player);
 
-                    if(adress1 == null || adress2 == null) {
+                    if (adress1 == null || adress2 == null) {
                         if (adress1 == null) {
                             adress1 = player.getAddress();
                         } else if (adress1 != player.getAddress()) {
                             adress2 = player.getAddress();
                         }
                     }
-                    if(port1 == 0 || port2 == 0) {
+                    if (port1 == 0 || port2 == 0) {
                         if (port1 == 0) {
                             port1 = player.getPort();
                         } else if (port1 != player.getPort()) {
@@ -61,26 +62,26 @@ public class GameServerThread extends Thread {
                         //figure out response
                         ball.ballMove();
 
-                        String ballPos = ball.getCurrentX() + " " + ball.getCurrentY();
-                        buff = ballPos.getBytes();
+                        String ballPos = ball.getCurrentX() + "," + ball.getCurrentY();
+
+                        buff =(Integer.valueOf(pad1.getCurrentPos()) + "," + ballPos).getBytes();
 
                         //send response to the client at ip and port
-                        player = new DatagramPacket(buff, buff.length, adress1 , port1);
+                        player = new DatagramPacket(buff, buff.length, adress1, port1);
                         socket.send(player);
                         player.setAddress(adress2);
                         player.setPort(port2);
                         socket.send(player);
-
-
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+
+                    }catch(InterruptedException e1){
+                        e1.printStackTrace();
+                    }catch(IOException e1){
+                        e1.printStackTrace();
+                    }
                 }
             }
-                //socket.close();
-            }
+
 
 
     protected String getNextData() {
