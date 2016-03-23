@@ -1,6 +1,6 @@
 package sample;
 
-public  class Ball {
+public class Ball {
 
     //Image image = new Image("sample/images/ball.png");
     private int playerScore = 0;

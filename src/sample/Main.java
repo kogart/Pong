@@ -35,8 +35,6 @@ public class Main extends Application
     int playerPos = 0;
     byte[] buff;
 
-
-
     public static void main(String[] args)throws IOException {
         adress = args[0];
       if (args.length != 1){
@@ -54,7 +52,6 @@ public class Main extends Application
         Group root = new Group();
         Scene theScene = new Scene( root );
         theStage.setScene( theScene );
-
 
         Canvas canvas = new Canvas( 1280, 720 );
         root.getChildren().add( canvas );
@@ -106,7 +103,7 @@ public class Main extends Application
                 break;
             default: break;
         }
-        socket = new DatagramSocket(0000);
+        socket = new DatagramSocket(0);
 
         KeyFrame kf = new KeyFrame(
                 Duration.seconds(0.034),        //         30 FPS
@@ -119,6 +116,7 @@ public class Main extends Application
                     {
 
                         try {
+                            System.out.printf("Sending request\n");
 
                                 //send request
 
@@ -134,10 +132,12 @@ public class Main extends Application
                                 DatagramPacket packet = new DatagramPacket(buff, buff.length, address, 8768);
                                 socket.send(packet);
 
+                            System.out.printf("getting response...\n");
                                 //get response
                                 buff = new byte[13];
                                 packet = new DatagramPacket(buff, buff.length);
                                 socket.receive(packet);
+                            System.out.printf("got response...\n");
 
                                 //display response
                                 received = new String(packet.getData(),0,packet.getLength());
