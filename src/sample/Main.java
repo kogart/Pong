@@ -31,7 +31,9 @@ public class Main extends Application
     Image pad2 = new Image("sample/images/padPlayer2-can.png");
     static String recData[];
     static DatagramSocket socket = null;
-    static double pad1pos;
+    static double pad2pos;
+    int playerPos = 0;
+    byte[] buff;
 
 
 
@@ -84,11 +86,6 @@ public class Main extends Application
 
 
 
-
-
-
-
-
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         Image space = new Image("sample/images/bg.png");
@@ -99,12 +96,16 @@ public class Main extends Application
 
         final long timeStart = System.currentTimeMillis();
 
-        // Create player pad
-        player1 = new Pad(20);
 
-        // Create opponent pad
-        player2 = new Pad(1180);
-
+        switch (playerPos){
+            case 0: player1 = new Pad(20);
+                    player2 = new Pad(1180);
+                break;
+            case 1: player1 = new Pad(1180);
+                    player2 = new Pad(20);
+                break;
+            default: break;
+        }
         socket = new DatagramSocket(0000);
 
         KeyFrame kf = new KeyFrame(
@@ -120,20 +121,28 @@ public class Main extends Application
                         try {
 
                                 //send request
-                                byte[] buff = Integer.toString(player1.getCurrentPos()).getBytes();
+
+                            switch (playerPos){
+                                case 0:  buff = ("0," + Integer.toString(player1.getCurrentPos())).getBytes();
+                                    break;
+                                case 1:  buff = ("1," + Integer.toString(player1.getCurrentPos())).getBytes();
+                                    break;
+                                default:
+                                    break;
+                            }
                                 InetAddress address = InetAddress.getByName(adress);
-                                DatagramPacket packet = new DatagramPacket(buff, buff.length, address, 7537);
+                                DatagramPacket packet = new DatagramPacket(buff, buff.length, address, 8768);
                                 socket.send(packet);
 
                                 //get response
-                                buff = new byte[12];
+                                buff = new byte[13];
                                 packet = new DatagramPacket(buff, buff.length);
                                 socket.receive(packet);
 
                                 //display response
                                 received = new String(packet.getData(),0,packet.getLength());
                                 recData = received.split(",");
-                                pad1pos = Double.parseDouble(recData[0]);
+                                pad2pos = Double.parseDouble(recData[0]);
                                 ballPosX = Integer.valueOf(recData[1]);
                                 ballPosY = Integer.valueOf(recData[2]);
 
@@ -143,16 +152,12 @@ public class Main extends Application
                             e.printStackTrace();
                         }
 
-                        //double t = (System.currentTimeMillis() - timeStart) / 1000.0;
-
                         if(input.contains("UP")) {
                             player1.moveUp();
-                            player2.moveUp();
                         }
 
                         if(input.contains("DOWN")) {
                             player1.moveDown();
-                            player2.moveDown();
                         }
 
                         // Clear the canvas
@@ -160,8 +165,19 @@ public class Main extends Application
 
                         // background image clears canvas
                         gc.drawImage( space, 0, 0 );
-                        gc.drawImage( pad1, 20, pad1pos );
-                        //gc.drawImage( pad2, player2.getStartX(), player2.getCurrentPos());
+
+
+
+
+                        switch (playerPos){
+                            case 0: gc.drawImage( pad1, player1.getStartX(), player1.getCurrentPos() );
+                                    gc.drawImage( pad2, player2.getStartX(), pad2pos);
+                                break;
+                            case 1: gc.drawImage( pad2, player1.getStartX(), player1.getCurrentPos() );
+                                    gc.drawImage( pad1, player2.getStartX(), pad2pos);
+                                break;
+                            default: break;
+                        }
                         gc.drawImage( ball , ballPosX , ballPosY );
                     }
                 });

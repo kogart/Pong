@@ -1,11 +1,11 @@
 package sample;
 
-public class Ball {
+public  class Ball {
 
     //Image image = new Image("sample/images/ball.png");
     private int playerScore = 0;
-    private int currentX;
-    private int currentY;
+    private static int currentX;
+    private static int currentY;
     private int startY;
     private int startX;
     private double ballSpeedY = 5;
@@ -15,7 +15,7 @@ public class Ball {
     final double BallMinY = 0;
     final double BallMaxY = 650;
 
-    public Ball(int startX, int startY){
+    public  Ball(int startX, int startY){
         this.startX = startX;
         this.startY = startY;
     }
