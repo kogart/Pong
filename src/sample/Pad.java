@@ -1,8 +1,6 @@
 package sample;
-import javafx.scene.image.Image;
 
 public class Pad {
-    Image padImage;
     final int PAD_MIN_Y = 0;
     final int PAD_MAX_Y = 520;
     final int PAD_SPEED = 7;
@@ -12,10 +10,6 @@ public class Pad {
     public Pad(int startX){
         this.startX = startX;
 
-    }
-
-    public Image getImage(){
-        return this.padImage;
     }
 
     public int getStartX(){

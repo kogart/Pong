@@ -34,6 +34,7 @@ public class Main extends Application
     static double pad2pos;
     int playerPos = 0;
     byte[] buff;
+    DatagramPacket packet;
 
     public static void main(String[] args)throws IOException {
         adress = args[0];
@@ -104,6 +105,11 @@ public class Main extends Application
             default: break;
         }
         socket = new DatagramSocket(0);
+        buff = new byte[13];
+        packet = new DatagramPacket(buff, buff.length);
+
+        Reciver rec = new Reciver(socket,this,packet);
+        rec.start();
 
         KeyFrame kf = new KeyFrame(
                 Duration.seconds(0.034),        //         30 FPS
@@ -116,7 +122,7 @@ public class Main extends Application
                     {
 
                         try {
-                            System.out.printf("Sending request\n");
+                            //System.out.printf("Sending request\n");
 
                                 //send request
 
@@ -129,23 +135,22 @@ public class Main extends Application
                                     break;
                             }
                                 InetAddress address = InetAddress.getByName(adress);
-                                DatagramPacket packet = new DatagramPacket(buff, buff.length, address, 8768);
+                                packet = new DatagramPacket(buff, buff.length, address, 8768);
                                 socket.send(packet);
 
-                            System.out.printf("getting response...\n");
                                 //get response
-                                buff = new byte[13];
-                                packet = new DatagramPacket(buff, buff.length);
-                                socket.receive(packet);
-                            System.out.printf("got response...\n");
+                                //buff = new byte[13];
+                                //packet = new DatagramPacket(buff, buff.length);
+                                //socket.receive(packet);
 
                                 //display response
-                                received = new String(packet.getData(),0,packet.getLength());
-                                recData = received.split(",");
+                                //received = new String(packet.getData(),0,packet.getLength());
+                                //recData = received.split(",");
+                            if (recData != null) {
                                 pad2pos = Double.parseDouble(recData[0]);
                                 ballPosX = Integer.valueOf(recData[1]);
                                 ballPosY = Integer.valueOf(recData[2]);
-
+                            }
 
                         }catch (IOException e)
                         {
@@ -178,6 +183,7 @@ public class Main extends Application
                                 break;
                             default: break;
                         }
+                        if(ballPosX != null)
                         gc.drawImage( ball , ballPosX , ballPosY );
                     }
                 });
@@ -186,5 +192,36 @@ public class Main extends Application
         gameLoop.play();
 
         theStage.show();
+    }
+}
+class Reciver extends Thread{
+    DatagramSocket socket;
+    DatagramPacket packet;
+    Main main;
+    Byte[] buff;
+
+    public Reciver(DatagramSocket socket, Main main, DatagramPacket packet){
+        this.socket = socket;
+        this.main = main;
+        this.packet = packet;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            buff = new Byte[13];
+            try {
+                socket.receive(packet);
+                main.packet = this.packet;
+                main.received = new String(packet.getData(),0,packet.getLength());
+                main.recData = main.received.split(",");
+
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 }

@@ -1,5 +1,6 @@
 package sample;
 
+
 import java.io.*;
 import java.net.*;
 
@@ -20,11 +21,21 @@ public class GameServerThread extends Thread {
 
         public void run() {
             socketThread.start();
+            Thread game = new Thread(){
+                @Override
+                public void run() {
+                    try {
+                        ball.ballMove();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }; game.start();
 
             while (true) {
                 try {
                         //figure out response
-                        ball.ballMove();
 
                         String ballPos = ball.getCurrentX() + "," + ball.getCurrentY();
 
@@ -33,11 +44,10 @@ public class GameServerThread extends Thread {
                         socketThread.sendToPlayer1(buff);
                         buff = (Integer.valueOf(pad1.getCurrentPos()) + "," + ballPos).getBytes();
                         socketThread.sendToPlayer2(buff);
-                    }catch(InterruptedException e1){
-                        e1.printStackTrace();
-                    }catch(IOException e1){
+
+                    } catch(IOException e1){
                         e1.printStackTrace();}
-                }
+            }
             }
 
     private class SocketThread extends Thread {
@@ -57,20 +67,15 @@ public class GameServerThread extends Thread {
                     byte[] buff = new byte[13];
                     DatagramPacket recPack = new DatagramPacket(buff, 0, buff.length);
                     socket.receive(recPack);
+                    gameServerThread.ball.ballMove();
                     SocketAddress address = recPack.getSocketAddress();
-                    System.out.printf("<- [%s] %d bytes\n",
-                            address,
-                            recPack.getLength());
-
                     for (int i = 0; i < 2; i++) {
                         if (players[i] == null) {
                             // Add to players
                             players[i] = new Player(address);
-                            System.out.printf("Assigning as player #%d\n", i);
                         }
                         if (players[i].address.equals(address)) {
                             String received = new String(recPack.getData(), 0, recPack.getLength());
-                            System.out.printf("Player #%d sent us %s\n", i, received);
                             String[] recarr = received.split(",");
                             int position = Integer.parseInt(recarr[1]);
                             if (i == 0) {
@@ -82,6 +87,8 @@ public class GameServerThread extends Thread {
                         }
                     }
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
